@@ -1,0 +1,863 @@
+@import "https://fonts.googleapis.cn/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@600;900&family=Space+Mono:wght@400;700&family=Baloo+2:wght@500;600;700;800&display=swap";
+@import "tailwindcss";
+
+@theme {
+  /* SIM 紫色明亮主题 */
+  --color-bg: oklch(0.96 0.03 300);
+  --color-sky-a: oklch(0.94 0.045 295);
+  --color-sky-b: oklch(0.95 0.04 250);
+  --color-panel: oklch(0.99 0.012 300);
+  --color-ink: oklch(0.34 0.06 295);
+  --color-ink-soft: oklch(0.48 0.055 295);
+  --color-ink-faint: oklch(0.6 0.045 295);
+  --color-violet: oklch(0.62 0.19 300);
+  --color-violet-bright: oklch(0.7 0.2 305);
+  --color-lilac: oklch(0.86 0.085 305);
+  --color-mint: oklch(0.8 0.15 165);
+  --color-coin: oklch(0.86 0.16 90);
+  --color-line: oklch(0.55 0.08 300 / 0.2);
+
+  --font-sans: "Noto Sans SC", "Space Grotesk", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Noto Sans SC", sans-serif;
+  --font-rounded: "Baloo 2", "Noto Sans SC", sans-serif;
+  --font-mono: "Space Mono", "Noto Sans SC", monospace;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* iOS 启停 tap 高亮 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================================
+   移动端通用（安卓 / iOS 通用）
+   ============================================================ */
+:root {
+  /* iOS 安全区变量（无刘海时归零，wingman 兼容安卓弯曲屏） */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* 动态视口高度：iOS Safari 收起/展开地址栏时布局不错位 */
+html, body {
+  height: 100%;
+}
+body {
+  /* 兼容不支持 dvh 的老安卓 WebView */
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* 触屏设备：禁用非必要的 hover 缩放、去掉自定义光标的残留；
+   触屏没有 pointermove，禁止残留 fixed 光标元素干扰点按 */
+@media (hover: none) and (pointer: coarse) {
+  * { touch-action: manipulation; }
+  a, button { -webkit-user-select: none; user-select: none; }
+}
+
+/* 通用底部/顶部安全区工具类 */
+.safe-pt { padding-top: calc(var(--sat, 0px)); }
+.safe-pb { padding-bottom: calc(var(--sab, 0px)); }
+.safe-pl { padding-left: calc(var(--sal, 0px)); }
+.safe-pr { padding-right: calc(var(--sar, 0px)); }
+
+body {
+  background:
+    radial-gradient(1200px 800px at 78% -8%, oklch(0.88 0.1 305 / 0.55), transparent 60%),
+    radial-gradient(1000px 700px at 8% 12%, oklch(0.9 0.07 250 / 0.5), transparent 55%),
+    linear-gradient(160deg, var(--color-sky-a), var(--color-sky-b));
+  background-attachment: fixed;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+.font-rounded {
+  font-family: var(--font-rounded);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+.font-serif-sc {
+  font-family: "Noto Serif SC", serif;
+}
+
+::selection {
+  background: var(--color-violet);
+  color: #fff;
+}
+
+/* ---------- 游戏面板 ---------- */
+.sim-panel {
+  background: color-mix(in oklch, var(--color-panel) 82%, transparent);
+  backdrop-filter: blur(14px);
+  border: 1.5px solid color-mix(in oklch, var(--color-violet) 22%, transparent);
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+    0 18px 40px -20px oklch(0.55 0.18 300 / 0.35);
+  transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-soft), border-color 0.3s;
+}
+.sim-panel:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklch, var(--color-violet) 45%, transparent);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.8) inset,
+    0 28px 55px -22px oklch(0.55 0.2 300 / 0.45);
+}
+
+/* 胶囊徽章 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.85rem;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in oklch, var(--color-violet) 30%, transparent);
+  background: color-mix(in oklch, var(--color-lilac) 45%, white);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-violet);
+  font-weight: 700;
+}
+
+/* 章节标签牌（SIM 对话框式） */
+.sim-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  background: var(--color-violet);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  box-shadow: 0 8px 20px -8px oklch(0.55 0.2 300 / 0.6);
+}
+
+/* ---------- Plumbob 晶锥 ---------- */
+.plumbob {
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  position: relative;
+  filter: drop-shadow(0 4px 8px oklch(0.6 0.2 300 / 0.4));
+}
+.plumbob-top {
+  border-bottom: 20px solid var(--color-violet-bright);
+}
+.plumbob-bottom {
+  border-top: 20px solid var(--color-violet);
+  margin-top: -1px;
+}
+@keyframes plumbob-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(8deg); }
+}
+.plumbob-float {
+  animation: plumbob-float 4.5s var(--ease-soft) infinite;
+}
+
+/* ---------- 动效 ---------- */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(34px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.rise-in {
+  opacity: 0;
+  animation: rise-in 0.9s var(--ease-spring) forwards;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret-blink {
+  animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.6); }
+  70% { transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* 技能进度条填充 */
+.skill-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-violet), var(--color-violet-bright));
+  width: 0;
+  transition: width 1.2s var(--ease-spring);
+  box-shadow: 0 0 12px oklch(0.65 0.2 305 / 0.6);
+}
+
+/* 跑马灯 */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* 滚动提示箭头 */
+@keyframes scrollhint {
+  0% { transform: translateY(0); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(10px); opacity: 0; }
+}
+.scroll-hint span {
+  animation: scrollhint 1.8s ease-in-out infinite;
+}
+
+/* 闪烁星点 */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise-in { opacity: 1; animation: none; }
+  .marquee-track, .plumbob-float, .scroll-hint span { animation: none !important; }
+  .skill-bar-fill { transition: none; }
+}
+
+/* ============================================================
+   主题切换器（全局，跨主题）
+   ============================================================ */
+@keyframes tsPop {
+  from { opacity: 0; transform: translateY(12px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tsBlink { 50% { opacity: 0.35; } }
+@keyframes tsSpin { from { transform: rotate(0); } to { transform: rotate(180deg); } }
+
+/* 切换器默认（浅色主题下） */
+body[data-theme="sims"] {
+  --ts-accent: oklch(0.62 0.19 300);
+  --ts-accent-soft: oklch(0.62 0.19 300 / 0.14);
+  --ts-glow: oklch(0.62 0.19 300 / 0.4);
+  --ts-card: oklch(1 0 0 / 0.9);
+  --ts-fg: oklch(0.32 0.06 295);
+  --ts-border: oklch(0.62 0.19 300 / 0.3);
+}
+
+/* ============================================================
+   主题 01 · 商务精英 BUSINESS（深蓝海军 + 鎏金）
+   ============================================================ */
+body[data-theme="business"] {
+  --biz-gold: #c9a35a;
+  --biz-gold-dark: #8a6d33;
+  background: #0e1626;
+  background-attachment: fixed;
+}
+.biz-root { color: rgba(255,255,255,0.86); }
+.biz-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(900px 600px at 80% -10%, rgba(201,163,90,0.14), transparent 60%),
+    radial-gradient(1000px 700px at 10% 110%, rgba(60,90,150,0.28), transparent 60%),
+    linear-gradient(165deg, #131d30 0%, #0d1524 45%, #0a101d 100%);
+}
+.biz-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 30%, black, transparent 80%);
+}
+
+/* ---- 圆柱器皿滚动：各章节轻微 3D 透视，随滚动"旋转" ---- */
+body[data-theme="business"] .biz-section {
+  transform-origin: center top;
+  transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ---- 金币引导 ---- */
+.biz-coin {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #f6e2a8, #d9b356 42%, #a87f2e 72%, #7a5a1e);
+  box-shadow: 0 0 0 6px rgba(201,163,90,0.18), 0 18px 40px rgba(0,0,0,0.5), inset 0 0 18px rgba(255,255,255,0.35);
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  transition: transform 1s cubic-bezier(0.22,1,0.36,1), opacity 1s ease;
+}
+.biz-coin-face {
+  width: 88px; height: 88px; border-radius: 50%;
+  border: 2px solid rgba(122,90,30,0.55);
+  display: grid; place-items: center;
+  font-family: var(--biz-serif);
+  font-size: 46px;
+  color: rgba(90,64,18,0.9);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.biz-coin-spin {
+  animation: coinSpin 1.1s cubic-bezier(0.66,0,0.01,1) infinite, coinGrow 2.6s ease forwards;
+}
+.biz-coin-burst {
+  transform: scale(9);
+  opacity: 0;
+}
+@keyframes coinSpin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+@keyframes coinGrow {
+  0% { transform: scale(1); }
+  70% { transform: scale(1.6); }
+  100% { transform: scale(2.2); }
+}
+.biz-coin-word {
+  position: absolute;
+  z-index: 3;
+  font-family: var(--biz-serif);
+  font-size: clamp(28px, 5vw, 52px);
+  letter-spacing: 0.35em;
+  color: var(--biz-gold);
+  text-shadow: 0 0 24px rgba(201,163,90,0.6);
+  white-space: nowrap;
+}
+.biz-caret { animation: bizBlink 0.8s steps(1) infinite; margin-left: 4px; }
+@keyframes bizBlink { 50% { opacity: 0; } }
+.biz-flash {
+  position: absolute; inset: 0; margin: auto;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,163,90,0.55), transparent 70%);
+  animation: bizFlash 1.1s ease-out forwards;
+  z-index: 1;
+}
+@keyframes bizFlash {
+  from { transform: scale(0.4); opacity: 0.9; }
+  to { transform: scale(6); opacity: 0; }
+}
+
+/* ---- 聊天面板 ---- */
+.biz-chat-mask {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(6,11,22,0.72);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.biz-chat-panel {
+  width: min(760px, 100%);
+  height: min(80vh, 720px);
+  background: linear-gradient(180deg, #121c30, #0d1626);
+  border: 1px solid rgba(201,163,90,0.35);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,163,90,0.1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: chatPop 0.4s cubic-bezier(0.34,1.4,0.64,1);
+}
+@keyframes chatPop { from { transform: translateY(30px) scale(0.96); opacity: 0; } to { transform: none; opacity: 1; } }
+.biz-chat-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(201,163,90,0.2);
+}
+.biz-chat-close {
+  background: none; border: 1px solid rgba(255,255,255,0.2);
+  color: var(--biz-fg); width: 34px; height: 34px; border-radius: 50%;
+  font-size: 20px; cursor: pointer; line-height: 1;
+  transition: all 0.2s;
+}
+.biz-chat-close:hover { border-color: var(--biz-gold); color: var(--biz-gold); }
+.biz-role-tabs { display: flex; gap: 10px; padding: 14px 22px; flex-wrap: wrap; }
+.biz-role-tab {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--biz-muted);
+  padding: 8px 14px; border-radius: 999px;
+  font-size: 13px; cursor: pointer; transition: all 0.2s;
+  font-family: var(--biz-sans);
+}
+.biz-role-tab.active {
+  background: rgba(201,163,90,0.16);
+  border-color: var(--biz-gold);
+  color: var(--biz-gold);
+}
+.biz-chat-body {
+  flex: 1; overflow-y: auto;
+  padding: 8px 22px 18px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.biz-msg { display: flex; gap: 10px; align-items: flex-start; }
+.biz-msg-user { flex-direction: row-reverse; }
+.biz-msg-avatar {
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--biz-mono); font-size: 11px; letter-spacing: 0.05em;
+  background: linear-gradient(135deg, var(--biz-gold), #8a6a28);
+  color: #0d1626; font-weight: 700;
+}
+.biz-bubble {
+  max-width: 78%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14.5px; line-height: 1.75;
+  font-family: var(--biz-sans);
+}
+.biz-bubble-ai {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--biz-fg);
+  border-top-left-radius: 4px;
+}
+.biz-bubble-ai strong { color: var(--biz-gold); font-weight: 600; }
+.biz-bubble-user {
+  background: linear-gradient(135deg, rgba(201,163,90,0.9), rgba(170,130,55,0.9));
+  color: #0d1626; font-weight: 500;
+  border-top-right-radius: 4px;
+}
+.biz-quick { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.biz-quick-btn {
+  text-align: left;
+  background: rgba(201,163,90,0.08);
+  border: 1px solid rgba(201,163,90,0.3);
+  color: var(--biz-gold);
+  padding: 8px 12px; border-radius: 10px;
+  font-size: 13px; cursor: pointer; transition: all 0.2s;
+  font-family: var(--biz-sans);
+}
+.biz-quick-btn:hover:not(:disabled) { background: rgba(201,163,90,0.18); }
+.biz-quick-btn:disabled { opacity: 0.5; cursor: default; }
+.biz-typing-dots { display: inline-flex; gap: 4px; }
+.biz-typing-dots i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--biz-gold);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.biz-typing-dots i:nth-child(2) { animation-delay: 0.2s; }
+.biz-typing-dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dotPulse { 0%,100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+.biz-chat-input {
+  display: flex; gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(201,163,90,0.2);
+}
+.biz-chat-input input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--biz-fg);
+  font-size: 14px;
+  font-family: var(--biz-sans);
+  outline: none;
+}
+.biz-chat-input input:focus { border-color: var(--biz-gold); }
+.biz-send-btn {
+  background: linear-gradient(135deg, var(--biz-gold), #a87f2e);
+  color: #0d1626;
+  border: none; border-radius: 10px;
+  padding: 0 22px; font-weight: 700; font-size: 14px;
+  cursor: pointer; font-family: var(--biz-sans);
+  transition: filter 0.2s;
+}
+.biz-send-btn:hover:not(:disabled) { filter: brightness(1.1); }
+.biz-send-btn:disabled { opacity: 0.4; cursor: default; }
+.biz-send-btn.stop { background: rgba(255,255,255,0.12); color: var(--biz-fg); }
+
+/* ============================================================
+   主题 02 · 宇宙星图 COSMOS
+   ============================================================ */
+body[data-theme="cosmos"] {
+  background: #03040c;
+  background-attachment: fixed;
+  --ts-accent: #6ea0ff;
+  --ts-accent-soft: rgba(110,160,255,0.16);
+  --ts-glow: rgba(110,160,255,0.4);
+  --ts-card: rgba(10,14,30,0.92);
+  --ts-fg: #dfe8ff;
+  --ts-border: rgba(140,170,255,0.35);
+  cursor: none;
+}
+body[data-theme="cosmos"] a,
+body[data-theme="cosmos"] button { cursor: none; }
+body[data-theme="cosmos"].enterprise-cursor-on,
+body[data-theme="cosmos"].enterprise-cursor-on * { cursor: none !important; }
+body[data-theme="cosmos"] .cosmos-detail,
+body[data-theme="cosmos"] .cosmos-detail *, 
+body[data-theme="cosmos"] .cosmos-detail button { cursor: auto; }
+body[data-theme="cosmos"] .cosmos-root:has(.cosmos-detail) .enterprise-cursor { display: none; }
+
+/* 企业号飞船尾焰 */
+@keyframes warpFlame {
+  0%, 100% { opacity: 0.9; transform: scaleX(1) translateX(0); }
+  50% { opacity: 0.55; transform: scaleX(0.82) translateX(-2px); }
+}
+
+.enterprise-thruster { animation: thrusterPulse 1.1s ease-in-out infinite; }
+@keyframes thrusterPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* ---- SIM 小人鼠标 ---- */
+body[data-theme="sims"].sim-cursor-on,
+body[data-theme="sims"].sim-cursor-on * { cursor: none !important; }
+
+.sim-plumbob-float { animation: plumbobFloat 2.4s ease-in-out infinite; }
+@keyframes plumbobFloat { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
+
+.sim-girl { transform-origin: bottom center; }
+/* 待机：轻微呼吸 */
+.sim-girl.sim-idle { animation: simIdle 2.6s ease-in-out infinite; }
+@keyframes simIdle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+/* 走路：身体上下 + 四肢轻摆 */
+.sim-girl.sim-walk { animation: simWalk 0.5s ease-in-out infinite; }
+@keyframes simWalk {
+  0%,100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-3px) rotate(1deg); }
+}
+/* ===== 四肢摆动：旋转轴固定在肩/髋关节，肢体始终连在身体上 =====
+   transform-box: view-box 时 transform-origin 用 SVG 用户坐标，
+   分别对齐 SimGirl 里两个肩关节(60,50)/(28,50) 与两个髋关节(50,98)/(44,98)。 */
+.sim-girl .arm-front,
+.sim-girl .arm-back,
+.sim-girl .leg-front,
+.sim-girl .leg-back { transform-box: view-box; will-change: transform; }
+.sim-girl .arm-front { transform-origin: 28px 50px; }
+.sim-girl .arm-back  { transform-origin: 60px 50px; }
+.sim-girl .leg-front { transform-origin: 44px 98px; }
+.sim-girl .leg-back  { transform-origin: 50px 98px; }
+
+/* 走路：小幅度自然摆动（前臂基准略内收 -8deg） */
+.sim-girl.sim-walk .leg-front { animation: legWalk 0.5s ease-in-out infinite; }
+.sim-girl.sim-walk .leg-back { animation: legWalkB 0.5s ease-in-out infinite; }
+.sim-girl.sim-walk .arm-front { animation: armWalk 0.5s ease-in-out infinite; }
+.sim-girl.sim-walk .arm-back { animation: armWalkB 0.5s ease-in-out infinite; }
+@keyframes legWalk { 0%,100% { transform: rotate(16deg); } 50% { transform: rotate(-16deg); } }
+@keyframes legWalkB { 0%,100% { transform: rotate(-16deg); } 50% { transform: rotate(16deg); } }
+@keyframes armWalk { 0%,100% { transform: rotate(-22deg); } 50% { transform: rotate(6deg); } }
+@keyframes armWalkB { 0%,100% { transform: rotate(20deg); } 50% { transform: rotate(-6deg); } }
+
+/* 跑步：身体前倾（外层容器 rotate 8deg），四肢围绕关节大幅但不离体地摆动 */
+.sim-girl.sim-run { animation: simRun 0.3s ease-in-out infinite; }
+@keyframes simRun {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+.sim-girl.sim-run .leg-front { animation: legRun 0.3s ease-in-out infinite; }
+.sim-girl.sim-run .leg-back { animation: legRunB 0.3s ease-in-out infinite; }
+.sim-girl.sim-run .arm-front { animation: armRun 0.3s ease-in-out infinite; }
+.sim-girl.sim-run .arm-back { animation: armRunB 0.3s ease-in-out infinite; }
+/* 抬腿幅度收敛到 28° 内，脚始终在身体下方 */
+@keyframes legRun { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
+@keyframes legRunB { 0%,100% { transform: rotate(-26deg); } 50% { transform: rotate(26deg); } }
+/* 摆臂前后各约 30°，手不离开躯干两侧 */
+@keyframes armRun { 0%,100% { transform: rotate(-34deg); } 50% { transform: rotate(24deg); } }
+@keyframes armRunB { 0%,100% { transform: rotate(30deg); } 50% { transform: rotate(-26deg); } }
+@keyframes simFootFade {
+  0% { opacity: 0.55; transform: translate(-50%,-50%) scale(1); }
+  60% { opacity: 0.4; }
+  100% { opacity: 0; transform: translate(-50%,-50%) scale(0.7); }
+}
+
+/* ============================================================
+   主题 04 · 艺术装置 STUDIO（caliyang 深色 HUD）
+   ============================================================ */
+body[data-theme="studio"] {
+  background: #06070f;
+  background-attachment: fixed;
+  --ts-accent: #8d7bd8;
+  --ts-accent-soft: rgba(141,123,216,0.16);
+  --ts-glow: rgba(141,123,216,0.4);
+  --ts-card: rgba(12,10,24,0.92);
+  --ts-fg: #e7e6f5;
+  --ts-border: rgba(170,150,230,0.32);
+}
+
+/* ---- 宇宙星图 COSMOS ---- */
+.cosmos-root { background: transparent; }
+.planet-wrap { position: relative; display: inline-grid; place-items: center; }
+.planet-body {
+  position: relative;
+  width: 72%;
+  height: 72%;
+  border-radius: 50%;
+  z-index: 1;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.planet-wrap:hover .planet-body { transform: scale(1.06) rotate(-8deg); }
+.planet-ring {
+  position: absolute;
+  width: 128%;
+  height: 38%;
+  border-radius: 50%;
+  transform: rotate(-22deg);
+  z-index: 2;
+  pointer-events: none;
+}
+.station-wrap { position: relative; display: inline-grid; place-items: center; }
+.station-dot { width: 50%; height: 50%; border-radius: 50%; }
+.station-orbit {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1.5px solid;
+  border-radius: 50%;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  animation: stationSpin 7s linear infinite;
+}
+@keyframes stationSpin { to { transform: rotate(360deg); } }
+
+/* 详情页：星球表面视角 */
+.cosmos-detail { background: #03040c; animation: detailIn 0.5s cubic-bezier(0.22,1,0.36,1); }
+@keyframes detailIn { from { opacity: 0; } to { opacity: 1; } }
+.surface-bg { position: fixed; inset: 0; z-index: 0; }
+.surface-stars {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 80% 40%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1.5px 1.5px at 75% 15%, rgba(255,255,255,0.6), transparent);
+}
+.surface-card {
+  position: relative;
+  border-radius: 18px;
+  border: 1px solid rgba(140,170,255,0.2);
+  background: rgba(8,12,28,0.6);
+  backdrop-filter: blur(14px);
+  padding: clamp(20px, 4vw, 38px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+body[data-theme="cosmos"] .cosmos-detail { cursor: auto; }
+body[data-theme="cosmos"] .cosmos-detail a,
+body[data-theme="cosmos"] .cosmos-detail button { cursor: pointer; }
+/* 星球详情覆盖层打开时，隐藏企业号光标，恢复系统可点击光标 */
+body[data-theme="cosmos"] .cosmos-root:has(.cosmos-detail) .enterprise-cursor { display: none; }
+
+/* 风格切换面板在自定义光标主题（cosmos/sims）下恢复系统光标，避免进入面板后光标消失 */
+body[data-theme="cosmos"] .ts-panel,
+body[data-theme="cosmos"] .ts-panel *,
+body[data-theme="sims"].sim-cursor-on .ts-panel,
+body[data-theme="sims"].sim-cursor-on .ts-panel *,
+body[data-theme="sims"] .ts-panel,
+body[data-theme="sims"] .ts-panel * { cursor: auto !important; }
+
+/* ---- 银河连接带：串联所有星体的流动发光带（含光点随带漂移） ---- */
+.cosmos-galaxy-belt { pointer-events: none; }
+.cosmos-galaxy-belt .galaxy-core {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(150,180,255,0.7) 12%,
+    rgba(200,170,255,0.85) 45%,
+    rgba(255,215,180,0.8) 55%,
+    rgba(150,190,255,0.6) 88%,
+    transparent
+  );
+  box-shadow: 0 0 18px 3px rgba(150,170,255,0.5);
+  filter: blur(0.4px);
+}
+.cosmos-galaxy-belt .galaxy-grain {
+  position: absolute;
+  left: 50%;
+  width: 5px; height: 5px;
+  margin-left: -2.5px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #fff, rgba(190,200,255,0.75) 45%, transparent 72%);
+  box-shadow: 0 0 12px 2px rgba(200,205,255,0.8);
+  opacity: 0;
+  animation: galaxy-drift linear infinite;
+}
+.galaxy-grain.g1 { top: 6%; animation-duration: 7s; animation-delay: 0s; }
+.galaxy-grain.g2 { top: 18%; animation-duration: 9s; animation-delay: 1.2s; }
+.galaxy-grain.g3 { top: 31%; animation-duration: 8s; animation-delay: 2.4s; }
+.galaxy-grain.g4 { top: 44%; animation-duration: 10s; animation-delay: 0.6s; }
+.galaxy-grain.g5 { top: 57%; animation-duration: 7.5s; animation-delay: 3s; }
+.galaxy-grain.g6 { top: 69%; animation-duration: 9.5s; animation-delay: 1.8s; }
+.galaxy-grain.g7 { top: 82%; animation-duration: 8.5s; animation-delay: 0.3s; }
+.galaxy-grain.g8 { top: 93%; animation-duration: 10.5s; animation-delay: 2s; }
+@keyframes galaxy-drift {
+  0% { opacity: 0; transform: translateX(-14px) translateY(-10px) scale(0.6); }
+  30% { opacity: 1; }
+  60% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateX(16px) translateY(12px) scale(1.3); }
+}
+
+/* ---- 水平螺旋旋臂连接带（参考银河生成图：横贯中部地平线的发光盘带） ---- */
+.cosmos-galaxy-belt-h {
+  pointer-events: none;
+  border-radius: 9999px;
+  background:
+    radial-gradient(ellipse at center, rgba(255,228,180,0.5) 0%, rgba(190,160,255,0.32) 30%, rgba(120,150,255,0.16) 58%, rgba(120,150,255,0) 78%);
+  filter: blur(6px);
+  opacity: 0.9;
+  animation: belt-breath 9s ease-in-out infinite;
+}
+@keyframes belt-breath {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.cosmos-galaxy-belt-h .galaxy-grain-h {
+  position: absolute;
+  top: 50%;
+  width: 5px; height: 5px;
+  margin-top: -2.5px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, #fff, rgba(190,200,255,0.75) 45%, transparent 72%);
+  box-shadow: 0 0 12px 2px rgba(200,205,255,0.8);
+  opacity: 0;
+  animation: galaxy-drift-h linear infinite;
+}
+.galaxy-grain-h.h1 { left: 4%;  animation-duration: 9s;  animation-delay: 0s; }
+.galaxy-grain-h.h2 { left: 16%; animation-duration: 11s; animation-delay: 1.4s; }
+.galaxy-grain-h.h3 { left: 29%; animation-duration: 8s;  animation-delay: 2.6s; }
+.galaxy-grain-h.h4 { left: 42%; animation-duration: 12s; animation-delay: 0.7s; }
+.galaxy-grain-h.h5 { left: 55%; animation-duration: 9.5s; animation-delay: 3.1s; }
+.galaxy-grain-h.h6 { left: 68%; animation-duration: 10.5s; animation-delay: 1.9s; }
+.galaxy-grain-h.h7 { left: 81%; animation-duration: 8.5s; animation-delay: 0.4s; }
+.galaxy-grain-h.h8 { left: 92%; animation-duration: 11.5s; animation-delay: 2.2s; }
+@keyframes galaxy-drift-h {
+  0% { opacity: 0; transform: translateX(-16px) translateY(-8px) scale(0.6); }
+  30% { opacity: 1; }
+  60% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateX(18px) translateY(10px) scale(1.3); }
+}
+
+/* ---- 星体在银河上浮沉（保持真实自转） ---- */
+.cosmos-float {
+  display: block;
+  animation: cosmos-bob 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes cosmos-bob {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(7px); }
+}
+
+/* 经历行星 hover：飞船光标扫过时星球放大 2.5 倍（桌面非触屏） */
+.cosmos-planet-zoom { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+@media (pointer: fine) {
+  body[data-theme="cosmos"] button:hover .cosmos-planet-zoom { transform: scale(2.5); }
+  body[data-theme="cosmos"] button:hover .cosmos-float { z-index: 5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cosmos-planet-zoom { transition: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cosmos-float,
+  .cosmos-galaxy-belt .galaxy-grain,
+  .cosmos-galaxy-belt-h .galaxy-grain-h,
+  .cosmos-galaxy-belt-h { animation: none !important; }
+  .cosmos-float { transform: translateY(0); }
+}
+
+/* ---- SIM 小人鼠标 ---- */
+body[data-theme="sims"] { cursor: none; }
+body[data-theme="sims"] a,
+body[data-theme="sims"] button { cursor: none; }
+body[data-theme="sims"] .sim-cursor,
+.sim-foot-layer { pointer-events: none; }
+.sim-cursor {
+  position: fixed;
+  left: 0; top: 0;
+  width: 52px;
+  height: 70px;
+  z-index: 95;
+  transform-origin: bottom center;
+  will-change: transform;
+  opacity: 0;
+}
+.sim-cursor-plumbob {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: plumbobBob 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(124,58,237,0.5));
+}
+.sim-cursor-body { display: flex; justify-content: center; }
+.sim-cursor-head {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: visible;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 16px rgba(124,58,237,0.4), 0 0 0 3px var(--color-violet);
+  background: #fff;
+  margin-top: 20px;
+}
+.sim-cursor-face {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  transform: scale(1.35);
+  object-position: center 22%;
+}
+.sim-spark {
+  position: absolute;
+  color: #fbbf24;
+  font-size: 13px;
+  filter: drop-shadow(0 0 4px rgba(251,191,36,0.8));
+}
+.sim-spark-1 { top: -8px; right: -10px; animation: sparkTwinkle 1.4s ease-in-out infinite; }
+.sim-spark-2 { top: 6px; left: -12px; font-size: 10px; animation: sparkTwinkle 1.4s ease-in-out 0.5s infinite; }
+@keyframes sparkTwinkle { 0%,100% { opacity: 0.3; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes plumbobBob { 0%,100% { transform: translateX(-50%) translateY(0) rotate(-4deg); } 50% { transform: translateX(-50%) translateY(-4px) rotate(4deg); } }
+
+/* 走路时轻摆、跑步时大摆 */
+.sim-cursor[data-state="walk"] .sim-cursor-head { animation: walkWaddle 0.5s ease-in-out infinite; }
+.sim-cursor[data-state="run"] .sim-cursor-head { animation: runWaddle 0.28s ease-in-out infinite; }
+@keyframes walkWaddle { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes runWaddle { 0%,100% { transform: rotate(-9deg) translateY(0); } 50% { transform: rotate(9deg) translateY(-3px); } }
+
+.sim-foot-layer { position: fixed; inset: 0; z-index: 94; }
+.sim-foot {
+  position: absolute;
+  width: 9px;
+  height: 13px;
+  border-radius: 45% 45% 50% 50%;
+  background: rgba(124,58,237,0.45);
+  transition: opacity .7s ease;
+  pointer-events: none;
+}
+
+
+
